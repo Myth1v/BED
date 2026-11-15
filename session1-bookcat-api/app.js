@@ -5,7 +5,9 @@ const sql = require('mssql');
 app.get('/', (req, res) => {
 res.send('Welcome to the Book Category API');
 });
-
+app.use(express.json());
+require("./authors.routes")(app);
+require("./publishers.routes")(app);
 
 app.listen(3000, () => {
 console.log('Listening on port 3000');
@@ -19,17 +21,7 @@ res.json([
 ]);
 });
 
-const dbConfig = {
-  server: process.env.DB_SERVER,
-  port: 1433,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  options: {
-    encrypt: true,
-    trustServerCertificate: true
-  }
-};
+const dbConfig = require('./dbconfig');
 
 app.get('/db-test', async (req, res) => {
 try {
