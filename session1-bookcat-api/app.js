@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const sql = require('mssql');
@@ -18,29 +19,29 @@ res.json([
 ]);
 });
 
-
-
-app.get('/db-test', async (req, res) => {
-try {
-const pool = await sql.connect({
-  server: 'localhost',
+const dbConfig = {
+  server: process.env.DB_SERVER,
   port: 1433,
-  database: 'NPBookstore',
-  user: 'dbuser',
-  password: '00998877',
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   options: {
     encrypt: true,
     trustServerCertificate: true
   }
-});
+};
+
+app.get('/db-test', async (req, res) => {
+try {
+const pool = await sql.connect(dbConfig);
 const result = await pool.request()
-.query('SELECT COUNT(*) AS Total FROM Author');
+  .query('SELECT COUNT(*) AS Total FROM Author');
 await pool.close();
 res.json({ connected: true, authors: result.recordset[0].Total });
 } catch (err) {
-    console.log(err)
+console.log(err);
 res.status(500).json({ connected: false, error: err.message });
-}
+  }
 });
 
 
